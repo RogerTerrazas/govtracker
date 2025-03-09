@@ -1,24 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 interface Bill {
   congress: number;
-  latestAction: { actionDate: string; text: string };
   number: string;
+  type: string;
   originChamber: string;
   title: string;
-  type: string;
-  url: string;
+  latestAction: { actionDate: string; text: string };
 }
 
 export default function BillsPage() {
@@ -28,7 +21,7 @@ export default function BillsPage() {
   useEffect(() => {
     const fetchBills = async () => {
       try {
-        const res = await fetch("/api/bills");
+        const res = await fetch(`/api/bills`);
         const data = await res.json();
         setBills(data);
       } catch (error) {
@@ -48,41 +41,43 @@ export default function BillsPage() {
   return (
     <main className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6 text-center">Government Bills</h1>
-      <Card>
-        <CardContent className="p-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Chamber</TableHead>
-                <TableHead>Latest Action</TableHead>
-                <TableHead>More Info</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bills.map((bill) => (
-                <TableRow key={bill.number}>
-                  <TableCell>{bill.title}</TableCell>
-                  <TableCell>{bill.originChamber}</TableCell>
-                  <TableCell>
-                    {bill.latestAction.text} ({bill.latestAction.actionDate})
-                  </TableCell>
-                  <TableCell>
-                    <a
-                      href={bill.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 underline"
-                    >
-                      View Bill
-                    </a>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {bills.map((bill, index) => (
+          <Card
+            key={index}
+            className="shadow-md border border-gray-200 h-[240px] flex flex-col m-2"
+          >
+            <CardContent className="flex flex-col grow">
+              {/* Wrap text content inside a flex-grow div */}
+              <div className="grow">
+                <h2 className="text-lg font-semibold line-clamp-3">
+                  {bill.title}
+                </h2>
+
+                <p className="text-sm text-gray-500 truncate">
+                  <strong>Chamber:</strong> {bill.originChamber}
+                </p>
+
+                <p className="text-sm text-gray-500 line-clamp-2">
+                  <strong>Latest Action:</strong> {bill.latestAction.text} (
+                  {bill.latestAction.actionDate})
+                </p>
+              </div>
+              {/* Button stays at the bottom */}
+              <Link
+                href={`/bills/${bill.congress}/${bill.type.toLowerCase()}/${
+                  bill.number
+                }`}
+              >
+                <Button variant="default" className="w-full">
+                  View Details
+                </Button>
+              </Link>
+              <div />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </main>
   );
 }
