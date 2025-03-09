@@ -10,7 +10,7 @@ export async function GET() {
 
     const data = await res.json();
     return NextResponse.json(data.bills);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to load bills" },
       { status: 500 }
