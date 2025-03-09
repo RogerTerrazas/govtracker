@@ -1,13 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   {
     params,
-  }: { params: { congress: string; billType: string; billNumber: string } }
+  }: {
+    params: Promise<{ congress: string; billType: string; billNumber: string }>;
+  }
 ) {
+  const { congress, billType, billNumber } = await params; // Await the params object
+
   const API_KEY = process.env.CONGRESS_API_KEY;
-  const { congress, billType, billNumber } = params;
   const API_URL = `https://api.congress.gov/v3/bill/${congress}/${billType}/${billNumber}?format=json&api_key=${API_KEY}`;
 
   try {
